@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login Page</title>
+    <style>
+      Body {
+        font-family: Calibri, Helvetica, sans-serif;
+        background-color: #fcf174;
+      }
+      button {
+        background-color: #4caf50;
+        width: 70%;
+        color: rgb(0, 0, 0);
+        padding: 15px;
+        margin: 10px 20px;
+        border: none;
+        cursor: pointer;
+      }
+
+      button[id="back"] {
+        background-color: #4b4b4b;
+        width: 10%;
+        color: rgb(255, 255, 255);
+        padding: 15px;
+        margin: 10px 0px;
+        border: none;
+        cursor: pointer;
+        font-size: larger;
+        display: inline-block;
+      }
+
+      form {
+        border: 3px solid #f1f1f1;
+        display: inline-block;
+        background-color: #84fc74;
+      }
+
+      form[id="list"],
+      [id="reviews"] {
+        width: 50%;
+        display: inline-block;
+        background-color: #ffffff;
+      }
+
+      form[id="searchRecipe"] {
+        width: 30%;
+        display: inline-block;
+        background-color: #3fa845;
+      }
+
+      form[id="enterReview"] {
+        margin-right: 200px;
+        width: 30%;
+        display: inline-block;
+        background-color: #3fa845;
+      }
+      input[type="text"],
+      input[type="password"] {
+        width: 100%;
+        margin: 8px 0;
+        padding: 12px 20px;
+        display: inline-block;
+        border: 2px solid green;
+        box-sizing: border-box;
+      }
+      button:hover {
+        opacity: 0.7;
+      }
+      .cancelbtn {
+        width: auto;
+        padding: 10px 18px;
+        margin: 10px 5px;
+      }
+
+      .container {
+        padding: 25px;
+        background-color: lightblue;
+      }
+
+      div[id="recipeDescription"] {
+        width: 50%;
+        display: inline-block;
+        margin-top: 20px;
+        background-color: #ffffff;
+      }
+
+      div[id="recipeName"] {
+        width: 50%;
+        font-size: larger;
+        margin-bottom: 20px;
+      }
+
+      div[id="buttons"] {
+        width: 10%;
+        font-size: larger;
+        display: grid;
+      }
+
+      dd {
+        margin-top: 10px;
+      }
+
+      dt {
+        margin-bottom: 10px;
+      }
+
+      textarea {
+        width: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      style="
+        display: flex;
+        flex-direction: row;
+        justify-content: right;
+        align-items: center;
+      "
+      id="RHS"
+    >
+      <form id="searchRecipe">
+        <center><h1>Search for Recipes by Name</h1></center>
+        <div class="container">
+          <label>Recipe Name: </label>
+
+          <input type="text" placeholder="Recipe" name="recipeName" />
+
+          <div>Select Recipe Below:</div>
+
+          <ul id="recipeList"></ul>
+        </div>
+      </form>
+
+      <div id="buttons">
+        <button id="search">Search</button>
+        <button id="displayReviews" recipeid="">
+          Show Reviews for Selected Recipe
+        </button>
+        <button id="reviewRecipe" recipeid="">
+          Add Review For Selected Recipe
+        </button>
+        <button id="deleteRecipe" recipeid="">Delete Selected Recipe</button>
+      </div>
+
+      <form id="list">
+        <center><h1>Selected Recipe</h1></center>
+        <div class="container">
+          <div id="recipeName" class="recipeDisplay"></div>
+          <div id="recipeDifficulty" class="recipeDisplay"></div>
+          <div id="recipeServingSize" class="recipeDisplay"></div>
+          <div id="recipePrepTime" class="recipeDisplay"></div>
+          <div id="recipeCookTime" class="recipeDisplay"></div>
+          <div id="recipeDescription" class="recipeDisplay"></div>
+        </div>
+      </form>
+    </div>
+
+    <div
+      style="
+        display: flex;
+        flex-direction: row;
+        justify-content: right;
+        align-items: right;
+      "
+      id="reviewDiv"
+    >
+      <form id="enterReview">
+        <center><h1>Review Selected Recipe</h1></center>
+        <div class="container">
+          <label>Rating : </label>
+
+          <input type="text" placeholder="1-5" name="reviewRating" />
+
+          <textarea name="reviewText" id="" cols="30" rows="20"></textarea>
+        </div>
+      </form>
+
+      <form id="reviews">
+        <center><h1>Reviews</h1></center>
+        <div class="container">
+          <dl id="reviewList"></dl>
+        </div>
+      </form>
+    </div>
+
+    <button id="back">Back</button>
+
+    <script>
+      const btn = document.getElementById("search");
+      btn.addEventListener("click", searchRecipes);
+
+      const btnback = document.getElementById("back");
+      btnback.addEventListener("click", goHome);
+
+      function goHome(event) {
+        window.location.href = "homePage.html";
+      }
+
+      // User has selected search for recipes
+      function searchRecipes(event) {
+        var recipeName = document.getElementsByName("recipeName")[0].value;
+
+        document.getElementById("reviewList").innerHTML = "";
+
+        document.getElementById("recipeName").innerHTML = "";
+        document.getElementById("recipeDifficulty").innerHTML = "";
+        document.getElementById("recipeServingSize").innerHTML = "";
+        document.getElementById("recipePrepTime").innerHTML = "";
+        document.getElementById("recipeCookTime").innerHTML = "";
+        document.getElementById("recipeDescription").innerHTML = "";
+
+        fetch("http://localhost:3001/recipe/search/" + recipeName, {
+          // Adding method type
+          method: "Get",
+
+          // Adding headers to the request
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        })
+          .then((res) => res.json())
+          .then((out) => {
+            listRecipes(out);
+          })
+          .catch((err) => console.error(err));
+      }
+
+      // lists the matching recipes below
+      function listRecipes(data) {
+        var mainContainer = document.getElementById("recipeList");
+        mainContainer.innerHTML = "";
+
+        for (var i = 0; i < data.length; i++) {
+          var newrecipe = document.createElement("li");
+          newrecipe.setAttribute("id", data[i].idRecipe);
+          newrecipe.innerHTML = data[i].name;
+
+          newrecipe.addEventListener("click", displayRecipe);
+
+          mainContainer.appendChild(newrecipe);
+        }
+      }
+
+      // recipe clicked, displaying recipe description + other information in recipe tab
+      function displayRecipe(event) {
+        recipeID = event.target.attributes.id.value;
+
+        var mainContainer = document.getElementById("buttons");
+
+        var reviewButton = document.getElementById("displayReviews");
+        reviewButton.setAttribute("recipeid", recipeID);
+
+        var toReviewButton = document.getElementById("reviewRecipe");
+        toReviewButton.setAttribute("recipeid", recipeID);
+
+        var deleteButton = document.getElementById("deleteRecipe");
+        deleteButton.setAttribute("recipeid", recipeID);
+
+        reviewButton.addEventListener("click", displayReviews);
+        toReviewButton.addEventListener("click", reviewRecipe);
+        deleteButton.addEventListener("click", deleteRecipe);
+
+        fetch("http://localhost:3001/recipe/" + recipeID, {
+          // Adding method type
+          method: "Get",
+
+          // Adding headers to the request
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        })
+          .then((res) => res.json())
+          .then((out) => {
+            showRecipe(out);
+          })
+          .catch((err) => console.error(err));
+      }
+
+      // actually showing the recipe in the recipe tab
+      function showRecipe(data) {
+        document.getElementById("recipeName").innerHTML = data[0].name;
+        document.getElementById("recipeDifficulty").innerHTML =
+          "Difficulty: " + data[0].difficulty;
+        document.getElementById("recipeServingSize").innerHTML =
+          "Serves: " + data[0].servingSize;
+        document.getElementById("recipePrepTime").innerHTML =
+          "Prep Time: " + data[0].prepTime;
+        document.getElementById("recipeCookTime").innerHTML =
+          "Cook Time: " + data[0].cookTime;
+        document.getElementById("recipeDescription").innerHTML =
+          data[0].textBody;
+      }
+
+      // user wants to delete a recipe
+      function deleteRecipe(event) {
+        recipeID = event.target.attributes.recipeid.value;
+
+        fetch("http://localhost:3001/recipe/delete/" + recipeID, {
+          // Adding method type
+          method: "DELETE",
+
+          // Adding headers to the request
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        })
+          .then((res) => res.json())
+          .then((out) => {})
+          .catch((err) => console.error(err));
+      }
+
+        // User has a review they want to add to the currently selected recipe 
+      function reviewRecipe(event) {
+        recipeID = event.target.attributes.recipeid.value;
+
+        var revtext = document.getElementsByName("reviewText")[0].value;
+        var revrating = document.getElementsByName("reviewRating")[0].value;
+
+        fetch("http://localhost:3001/recipe/review/new", {
+          // Adding method type
+          method: "POST",
+
+          body: JSON.stringify({
+            userIDref: 1,
+            recipeIDref: recipeID,
+            reviewText: revtext,
+            rating: revrating,
+          }),
+
+          // Adding headers to the request
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        })
+          .then((res) => res.json())
+          .then((out) => {})
+          .catch((err) => console.error(err));
+      }
+
+      // display all reviews for a recipe 
+      function displayReviews(event) {
+        recipeID = event.target.attributes.recipeid.value;
+
+        fetch("http://localhost:3001/recipe/reviews/" + recipeID, {
+          // Adding method type
+          method: "Get",
+
+          // Adding headers to the request
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        })
+          .then((res) => res.json())
+          .then((out) => {
+            showReview(out);
+          })
+          .catch((err) => console.error(err));
+      }
+
+      // actually show the review on the HTML
+      function showReview(data) {
+        var mainContainer = document.getElementById("reviewList");
+        mainContainer.innerHTML = "";
+
+        for (var i = 0; i < data.length; i++) {
+          var reviewRating = document.createElement("dd");
+          reviewRating.innerHTML = "Rating :" + data[i].rating + "/5";
+          var reviewText = document.createElement("dt");
+          reviewText.innerHTML = "Review :" + data[i].reviewText;
+
+          mainContainer.appendChild(reviewRating);
+          mainContainer.appendChild(reviewText);
+        }
+      }
+    </script>
+  </body>
+</html>

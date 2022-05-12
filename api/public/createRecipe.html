@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>New Recipe</title>
+    <style>
+      Body {
+        font-family: Calibri, Helvetica, sans-serif;
+        background-color: #fcf174;
+        display: inline-block;
+      }
+      button {
+        background-color: #4b4b4b;
+        width: 10%;
+        color: rgb(255, 255, 255);
+        padding: 15px;
+        margin: 10px 0px;
+        border: none;
+        cursor: pointer;
+        font-size: larger;
+        display: inline-block;
+      }
+
+      form {
+        border: 3px solid #f1f1f1;
+        display: inline-block;
+        background-color: #84fc74;
+        width: 50%;
+      }
+      input[type="text"],
+      input[type="password"] {
+        width: 100%;
+        margin: 8px 0;
+        padding: 12px 20px;
+        display: inline-block;
+        border: 2px solid green;
+        box-sizing: border-box;
+      }
+
+      textarea[name="recipeDescription"] {
+        width: 100%;
+        height: 200px;
+        margin: 8px 0;
+        padding: 12px 20px;
+        display: inline-block;
+        border: 2px solid green;
+        box-sizing: border-box;
+      }
+
+      button:hover {
+        opacity: 0.7;
+      }
+      .cancelbtn {
+        width: auto;
+        padding: 10px 18px;
+        margin: 10px 5px;
+      }
+
+      .container {
+        padding: 25px;
+        background-color: lightblue;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      style="
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <form>
+        <center><h1>New Recipe:</h1></center>
+
+        <div class="container">
+          <label>ID of user creating recipe:</label>
+          <input type="text" placeholder="ID" name="recipeUserId" />
+
+          <label>Recipe Name:</label>
+          <input type="text" placeholder="Name" name="recipeName" />
+
+          <label>Recipe Difficulty (1-5):</label>
+          <input type="text" placeholder="Difficulty" name="recipeDifficulty" />
+
+          <label>Serving Size (Integer):</label>
+          <input type="text" placeholder="Serves" name="recipeServingSize" />
+
+          <label>Prep Time (HH.MM):</label>
+          <input
+            type="text"
+            placeholder="Hours.minutes"
+            name="recipePrepTime"
+          />
+
+          <label>Cook Time (HH.MM):</label>
+          <input
+            type="text"
+            placeholder="Hours.minutes"
+            name="recipeCookTime"
+          />
+
+          <label>Recipe Description:</label>
+          <textarea
+            name="recipeDescription"
+            id=""
+            cols="30"
+            rows="20"
+          ></textarea>
+
+          <div id="errorMessage"></div>
+        </div>
+      </form>
+
+      <button id="autho">Submit Recipe</button>
+    </div>
+    <button id="back">Back</button>
+
+    <script>
+      const btn = document.getElementById("autho");
+      btn.addEventListener("click", submitRecipe);
+
+      const btnback = document.getElementById("back");
+      btnback.addEventListener("click", goHome);
+
+      function goHome(event) {
+        window.location.href = "homePage.html";
+      }
+
+      // user submits the recipe
+      function submitRecipe(event) {
+        var recipeUserId = document.getElementsByName("recipeUserId")[0].value;
+        var recipeName = document.getElementsByName("recipeName")[0].value;
+        var recipeDifficulty =
+          document.getElementsByName("recipeDifficulty")[0].value;
+        var recipeServingSize =
+          document.getElementsByName("recipeServingSize")[0].value;
+        var recipePrepTime =
+          document.getElementsByName("recipePrepTime")[0].value;
+        var recipeCookTime =
+          document.getElementsByName("recipeCookTime")[0].value;
+        var recipeDescription =
+          document.getElementsByName("recipeDescription")[0].value;
+
+        fetch("http://localhost:3001/recipe/new", {
+          // Adding method type
+          method: "POST",
+
+          // Adding body or contents to send
+          body: JSON.stringify({
+            name: recipeName,
+            difficulty: recipeDifficulty,
+            servingSize: recipeServingSize,
+            prepTime: recipePrepTime,
+            cookTime: recipeCookTime,
+            userIDref: recipeUserId,
+            textBody: recipeDescription,
+          }),
+
+          // Adding headers to the request
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        })
+          .then((res) => res.json())
+          .then((out) => {
+            console.log("Output: ", out);
+            displayMessage(out);
+          })
+          .catch((err) => console.error(err));
+      }
+
+      function displayMessage(data) {
+        var errorMessage = document.getElementById("errorMessage");
+        errorMessage.innerHTML = "Recipe Added!";
+      }
+    </script>
+  </body>
+</html>

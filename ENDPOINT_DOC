@@ -1,0 +1,210 @@
+-Endpoints of the form: http://localhost:3001/... unless you have changed the hosting in the API code.
+- an endpoint of the form /xyz/{id}/... means that {id} or whatever is replaced with your input directly
+  http://localhost:3001/recipe/{id} --> http://localhost:3001/recipe/3 will get the recipe of id '3'
+
+
+ENPOINTS
+
+GET ALL RECIPIES
+description:
+To get all recipe names + id's in the database currently.
+
+endpoint:
+GET    http://localhost:3001/recipe/all
+
+inputs needed:
+none
+
+outputs:
+in the BODY of the response, a list of JSON objects
+on postman for me it shows
+[
+    {
+        "idRecipe": 1,
+        "name": "apple pie"
+    },
+    {
+        "idRecipe": 2,
+        "name": "pear cobbler"
+    }
+]
+so there are 2 JSON objects in this list
+
+GET RECIPE BY ID
+description:
+get a recipe, by a id parameter
+
+endpoint:
+GET    http://localhost:3001/recipe/{id}
+
+inputs needed:
+{id}, which you are replacing with the id of the recipe you want
+
+outputs:
+in the BODY of the response, a list of JSON objects
+on postman for me it shows
+[
+    {
+        "idRecipe": 1,
+        "name": "apple pie",
+        "difficulty": null,
+        "dateCreated": null,
+        "servingSize": 4,
+        "prepTime": null,
+        "cookTime": null,
+        "userIDref": 1,
+        "recipeIDref": 1,
+        "wordCount": 333,
+        "textBody": "THIS IS A NEW DESCRIPTION, UPDATED VIA UPDATE ENDPOINT"
+    }
+]
+each key:value pair represents an attribute + value being returned 
+
+
+ADDING A NEW RECIPE TO THE DATABASE
+description:
+adding a new recipe, info passed via the body of the reguest
+
+endpoint:
+POST    http://localhost:3001/recipe/new
+
+inputs needed:
+you will be inputing this JSON object as in the body of your request
+*REQ means this field is required, any other can be removed if you do not want to add a value to that attribute
+"" means you need to enter a string
+int means enter a number
+{
+    "name": "",
+    "difficulty":int,
+    "servingSize": int,
+    "prepTime": decimal,
+    "cookTime": decimal,
+    "userIDref": int *REQ, the foriegn key pointing to a user ID of a user
+    "wordCount": int,
+    "textBody": "",
+}
+
+
+outputs:
+none.
+
+
+
+=========================================================================================================================
+GET SAVED RECIPES OF USER
+description: by userID, obtains the saved recipes (by recipe ID/name) of associated user
+
+endpoint:
+GET http://localhost:3001/favorites/{id}
+
+inputs needed:
+{id}, replaced with the ID of the user whose favorites we want (matching with currently logged in?)
+
+outputs:
+in the BODY of the response, a list of JSON objects
+as example, the below:
+[
+    {
+        "recipeIDref": 1,
+        "name": "apple pie"
+    }
+]
+
+
+=========================================================================================================================
+SAVE RECIPE TO USER FAVORITES
+description: save recipe as favorite
+
+endpoint:
+POST http://localhost:3001/favorites/save
+
+inputs needed:
+in the BODY of the request, a JSON object?
+{
+    "userIDref": int *REQ, the foreign key pointing to a user ID of a user
+    "recipeIDref": int *REQ, the foreign key pointing to a recipe ID of a recipe
+}
+
+outputs:
+none.
+
+
+=========================================================================================================================
+SUMMARY
+description:
+endpoint:
+TYPE http://localhost:3001/..................
+inputs needed:
+outputs:
+
+
+=========================================================================================================================
+SUMMARY
+description:
+endpoint:
+TYPE http://localhost:3001/..................
+inputs needed:
+outputs:
+
+
+=========================================================================================================================
+SUMMARY
+description:
+endpoint:
+TYPE http://localhost:3001/..................
+inputs needed:
+outputs:
+
+
+=========================================================================================================================
+SUMMARY
+description:
+endpoint:
+TYPE http://localhost:3001/..................
+inputs needed:
+outputs:
+
+
+=========================================================================================================================
+SUMMARY
+description:
+endpoint:
+TYPE http://localhost:3001/..................
+inputs needed:
+outputs:
+
+
+=========================================================================================================================
+SUMMARY
+description:
+endpoint:
+TYPE http://localhost:3001/..................
+inputs needed:
+outputs:
+
+
+=========================================================================================================================
+SUMMARY
+description:
+endpoint:
+TYPE http://localhost:3001/..................
+inputs needed:
+outputs:
+
+
+=========================================================================================================================
+SUMMARY
+description:
+endpoint:
+TYPE http://localhost:3001/..................
+inputs needed:
+outputs:
+
+
+
+
+
+
+
+
+

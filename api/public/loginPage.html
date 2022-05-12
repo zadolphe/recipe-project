@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login Page</title>
+    <style>
+      Body {
+        font-family: Calibri, Helvetica, sans-serif;
+        background-color: #fcf174;
+        display: inline-block;
+      }
+      button {
+        background-color: #4caf50;
+        width: 100%;
+        color: rgb(0, 0, 0);
+        padding: 15px;
+        margin: 10px 0px;
+        border: none;
+        cursor: pointer;
+        font-size: larger;
+      }
+
+      form {
+        border: 3px solid #f1f1f1;
+        display: inline-block;
+        background-color: #84fc74;
+      }
+      input[type="text"],
+      input[type="password"] {
+        width: 100%;
+        margin: 8px 0;
+        padding: 12px 20px;
+        display: inline-block;
+        border: 2px solid green;
+        box-sizing: border-box;
+      }
+
+      div[id="notes"] {
+        width: 100%;
+        margin: 8px 0;
+        padding: 12px 20px;
+        display: inline-block;
+        font-size: larger;
+
+        box-sizing: border-box;
+      }
+
+      button:hover {
+        opacity: 0.7;
+      }
+      .cancelbtn {
+        width: auto;
+        padding: 10px 18px;
+        margin: 10px 5px;
+      }
+
+      .container {
+        padding: 25px;
+        background-color: lightblue;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      style="
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <form>
+        <center><h1>General User Login</h1></center>
+        <div class="container">
+          <label>Username : </label>
+          <input type="text" placeholder="Enter Username" name="username" />
+
+          <label>Password : </label>
+
+          <input type="password" placeholder="Enter Password" name="pw" />
+
+          <div id="errorMessage"></div>
+          <div id="notes"></div>
+        </div>
+      </form>
+    </div>
+    <a href="newUser.html"> new user? </a>
+    <button id="autho">Login</button>
+
+    <script>
+      const btn = document.getElementById("autho");
+      btn.addEventListener("click", attemptLogin);
+
+      // user hits login button
+      function attemptLogin(event) {
+        var userName = document.getElementsByName("username")[0].value;
+        var userPW = document.getElementsByName("pw")[0].value;
+
+        fetch("http://localhost:3001/auth/authuser", {
+          // Adding method type
+          method: "POST",
+
+          // Adding body or contents to send
+          body: JSON.stringify({
+            username: userName,
+            password: userPW,
+          }),
+
+          // Adding headers to the request
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        })
+          .then((res) => res.json())
+          .then((out) => {
+            // display message to user
+            displayMessage(out, userName);
+          })
+          .catch((err) => console.error(err));
+      }
+
+      function displayMessage(data, username) {
+        if (data == "login successful") {
+          var Id;
+
+          console.log(username);
+
+          fetch("http://localhost:3001/auth/" + username)
+            .then((res) => res.json())
+            .then((out) => {
+              console.log("Output: ", out);
+              Id = parseId(out); // out is json containing the ID
+
+              var notesMessage = document.getElementById("notes");
+              notesMessage.innerHTML =
+                "Authentication successful! Your userID is: " + Id;
+
+              setTimeout(function () {
+                window.location.href = "homePage.html"; // change to home screen;
+              }, 2000); //pause briefly before redirect to display user ID
+            })
+            .catch((err) => console.error(err));
+        } else {
+          var errorMessage = document.getElementById("errorMessage");
+          errorMessage.innerHTML = " error: " + data;
+        }
+      }
+
+      // gets the user id
+      function parseId(jsondata) {
+        var userid;
+        userid = jsondata[0].idUser;
+        return userid;
+      }
+    </script>
+  </body>
+</html>
